@@ -11,6 +11,11 @@ Route::get('/', function () {
 Route::resource('books', BookController::class)
     ->only(['index', 'show']);
 
+// Books review routes with throttling only on the store route
 Route::resource('books.reviews', ReviewController::class)
     ->scoped(['review' => 'book'])
-    ->only(['create', 'store']);
+    ->only(['create']);
+
+Route::middleware('throttle:reviews')->group(function () {
+    Route::post('/books/{book}/reviews', [ReviewController::class, 'store'])->name('books.reviews.store');
+});
